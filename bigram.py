@@ -171,27 +171,6 @@ class BigramLanguageModel(nn.Module):
             idx = torch.cat((idx, idx_next), dim=1) # (B, T+1)
         return idx
 
-model = BigramLanguageModel()
-m = model.to(device)
-
-optimizer = torch.optim.AdamW(m.parameters(), lr=learning_rate) #pytorch optimizer
-
-for iter in range(max_iters):
-    if iter % eval_interval == 0:
-        losses = estimate_loss()
-        print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
-        
-    xb, yb = gen_batch('train') # get batch
-    logits, loss = m(xb,yb) #evaluate loss
-    optimizer.zero_grad(set_to_none=True)
-    loss.backward()
-    optimizer.step()
-
-context = torch.zeros((1,1), dtype=torch.long, device=device)
-print(decode(m.generate(context, max_new_tokens=300)[0].tolist()))
-
-
-
 # Attention is a communication mechanism. Can be seen as nodes in a directed graph looking at each other and aggregating information with a weighted sum from all nodes that point to them, with data-dependent weights.
 # There is no notion of space. Attention simply acts over a set of vectors. This is why we need to positionally encode tokens.
 # Each example across batch dimension is of course processed completely independently and never "talk" to each other
